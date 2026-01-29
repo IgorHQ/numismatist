@@ -6,12 +6,12 @@
     <title>Нумізмат Mobile Pro</title>
     <style>
         :root {
-            --safe-top: env(safe-area-inset-top, 0px);
-            --safe-bottom: env(safe-area-inset-bottom, 0px);
+            /* Відступи для iPhone з чубчиком та динамічним рядком Safari */
+            --safe-top: env(safe-area-inset-top, 20px);
+            --safe-bottom: env(safe-area-inset-bottom, 30px);
             --gold: #f1c40f;
             --blue: #3498db;
-            /* Висота зони для монети */
-            --coin-height: 60vh; 
+            --coin-height: 55vh; 
         }
 
         body { 
@@ -20,7 +20,6 @@
             color: white; -webkit-user-select: none; touch-action: manipulation;
         }
 
-        /* Контейнер для 3D */
         #container3d {
             position: absolute; top: 0; left: 0; width: 100%;
             height: var(--coin-height); z-index: 1;
@@ -44,47 +43,49 @@
             left: 15px; right: 15px; display: flex; justify-content: space-between; align-items: center;
         }
         .stat-group { display: flex; gap: 8px; }
-        .stat { background: rgba(20,20,20,0.85); padding: 8px 12px; border-radius: 15px; border: 1px solid var(--gold); font-size: 13px; font-weight: bold; }
+        .stat { background: rgba(20,20,20,0.9); padding: 8px 12px; border-radius: 15px; border: 1px solid var(--gold); font-size: 13px; font-weight: bold; }
 
         .top-btns { display: flex; gap: 5px; }
-        .reset-btn { background: rgba(231, 76, 60, 0.2); border: 1px solid #e74c3c; color: #e74c3c; padding: 8px 12px; border-radius: 12px; font-size: 11px; font-weight: bold; }
         .exit-btn { background: rgba(255, 255, 255, 0.1); border: 1px solid #fff; color: #fff; padding: 8px 12px; border-radius: 12px; font-size: 11px; font-weight: bold; }
+        .reset-btn { background: rgba(231, 76, 60, 0.2); border: 1px solid #e74c3c; color: #e74c3c; padding: 8px 12px; border-radius: 12px; font-size: 11px; font-weight: bold; }
 
-        /* Вікно з результатом — тепер чітко під монетою */
+        /* Вікно з результатом — піднято вище, щоб не заважало кнопкам */
         #modal {
             display: none; position: absolute; 
-            top: calc(var(--coin-height) - 20px); /* Початок відразу під монетою */
+            bottom: calc(110px + var(--safe-bottom)); 
             left: 50%; transform: translateX(-50%);
-            background: rgba(20,20,20,0.95); padding: 15px; border-radius: 20px; 
+            background: rgba(25,25,25,0.98); padding: 15px; border-radius: 20px; 
             text-align: center; border: 1px solid var(--gold); 
-            width: 85%; max-width: 300px; box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            width: 85%; max-width: 280px; box-shadow: 0 0 30px rgba(0,0,0,0.7);
         }
-
-        #album-window {
-            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: #111; padding: 20px; border-radius: 25px; z-index: 1500;
-            border: 2px solid #9b59b6; width: 85%; height: 60vh; flex-direction: column; pointer-events: auto;
-        }
-        #album-list { flex: 1; overflow-y: auto; }
-        .coin-row { background: #1a1a1a; margin-bottom: 8px; padding: 12px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; }
 
         .main-nav { 
-            position: absolute; bottom: calc(20px + var(--safe-bottom)); 
+            position: absolute; 
+            /* Піднімаємо кнопки вище за зону Safari */
+            bottom: calc(25px + var(--safe-bottom)); 
             left: 0; right: 0; display: flex; justify-content: center; gap: 8px; padding: 0 15px;
         }
-        .nav-btn { flex: 1; max-width: 130px; padding: 16px 5px; border-radius: 15px; border: none; font-weight: bold; font-size: 14px; }
+        .nav-btn { flex: 1; max-width: 130px; padding: 16px 5px; border-radius: 15px; border: none; font-weight: bold; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         .btn-blue { background: #3498db; color: white; }
         .btn-gold { background: var(--gold); color: black; }
         .btn-purple { background: #9b59b6; color: white; }
 
-        button:active { transform: scale(0.95); opacity: 0.8; }
+        #album-window {
+            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: #111; padding: 20px; border-radius: 25px; z-index: 1500;
+            border: 2px solid #9b59b6; width: 85%; height: 65vh; flex-direction: column; pointer-events: auto;
+        }
+        #album-list { flex: 1; overflow-y: auto; }
+        .coin-row { background: #1a1a1a; margin-bottom: 8px; padding: 12px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #333; }
+
+        button:active { transform: scale(0.92); opacity: 0.8; }
         button:disabled { opacity: 0.3; }
     </style>
 </head>
 <body>
 
 <div id="menu">
-    <h1 style="color:var(--gold); margin-bottom: 30px;">НУМІЗМАТ</h1>
+    <h1 style="color:var(--gold); margin-bottom: 30px; letter-spacing: 2px;">НУМІЗМАТ</h1>
     <button class="menu-btn" onclick="startGame('easy')">Простий</button>
     <button class="menu-btn" onclick="startGame('medium')">Середній</button>
     <button class="menu-btn" onclick="startGame('realism')">Реалізм</button>
@@ -108,8 +109,8 @@
         <h3 id="m-title" style="margin: 0 0 5px 0; font-size: 18px; color:var(--gold)"></h3>
         <div id="coin-desc" style="margin-bottom: 12px; font-size:14px; line-height: 1.3;"></div>
         <div style="display:flex; gap:8px;">
-            <button class="nav-btn btn-blue" style="width:50%; padding: 10px 0; height: auto;" onclick="keepFound()">В Альбом</button>
-            <button class="nav-btn" style="width:50%; background:#333; color:white; padding: 10px 0; height: auto;" onclick="sellFound()">Продати</button>
+            <button class="nav-btn btn-blue" style="width:50%; padding: 12px 0; height: auto; font-size: 12px;" onclick="keepFound()">В Альбом</button>
+            <button class="nav-btn" style="width:50%; background:#444; color:white; padding: 12px 0; height: auto; font-size: 12px;" onclick="sellFound()">Продати</button>
         </div>
     </div>
 
@@ -174,7 +175,7 @@
     const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(container.clientWidth, container.clientHeight);
-    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     container.appendChild(renderer.domElement);
     
     const light = new THREE.DirectionalLight(0xffffff, 2.5); light.position.set(2, 2, 5); scene.add(light);
@@ -196,8 +197,7 @@
             ctx.font = 'bold 60px Arial'; ctx.fillText(label, 0, 110);
         }
         ctx.restore();
-        const tex = new THREE.CanvasTexture(canvas); tex.center.set(0.5, 0.5);
-        return tex;
+        return new THREE.CanvasTexture(canvas);
     }
 
     const coinMesh = new THREE.Mesh(
@@ -215,9 +215,7 @@
         coinMesh.material[1].map = rev; coinMesh.material[1].needsUpdate = true;
         coinMesh.material[2].map = createFace("UA", y.toString(), isG, true, false);
         coinMesh.material[2].needsUpdate = true;
-        
-        // Авто-масштабування під розмір контейнера
-        let s = (container.clientWidth < 500 ? 0.8 : 1.1);
+        let s = (container.clientWidth < 500 ? 0.85 : 1.15);
         pivot.scale.set(s, s, s);
     }
 
@@ -247,13 +245,11 @@
     function keepFound() { myCoins.push(currentCoin); xp += (currentCoin.rare?50:5); closeModal(); saveProgress(); }
     function sellFound() { money += currentCoin.price; closeModal(); saveProgress(); }
     function closeModal() { document.getElementById('modal').style.display = 'none'; updateUI(); }
-    
     function toggleAlbum() {
         const w = document.getElementById('album-window');
         w.style.display = (w.style.display==='flex')?'none':'flex';
         if(w.style.display==='flex') renderAlbum();
     }
-    
     function renderAlbum() {
         const list = document.getElementById('album-list'); list.innerHTML = '';
         myCoins.forEach((c, i) => {
@@ -265,29 +261,19 @@
             list.appendChild(row);
         });
     }
-
     function sellFromAlbum(i) { money += myCoins[i].price; myCoins.splice(i, 1); updateUI(); renderAlbum(); saveProgress(); }
-    
     function updateUI() {
         document.getElementById('money-val').innerText = money;
         document.getElementById('xp-val').innerText = xp;
         document.getElementById('work-btn').disabled = xp < 8;
         document.getElementById('search-btn').disabled = money < config.search;
     }
-
-    function animate() { 
-        requestAnimationFrame(animate); 
-        pivot.rotation.y += 0.02; 
-        renderer.render(scene, camera); 
-    }
+    function animate() { requestAnimationFrame(animate); pivot.rotation.y += 0.02; renderer.render(scene, camera); }
     animate();
-
     window.addEventListener('resize', () => {
-        const w = container.clientWidth;
-        const h = container.clientHeight;
-        camera.aspect = w / h;
+        camera.aspect = container.clientWidth / container.clientHeight;
         camera.updateProjectionMatrix();
-        renderer.setSize(w, h);
+        renderer.setSize(container.clientWidth, container.clientHeight);
     });
 </script>
 </body>
