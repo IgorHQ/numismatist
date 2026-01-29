@@ -2,93 +2,116 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>Нумізмат: Реалістичний Брак</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Нумізмат Mobile Pro</title>
     <style>
-        body { margin: 0; overflow: hidden; background: #050505; font-family: 'Segoe UI', sans-serif; color: white; }
-
-        /* Меню вибору режиму */
-        #menu { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 3000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .menu-btn { width: 300px; padding: 20px; margin: 10px; border-radius: 15px; border: 2px solid #f1c40f; background: #111; color: white; cursor: pointer; font-weight: bold; font-size: 18px; transition: 0.3s; }
-        .menu-btn:hover { background: #f1c40f; color: black; }
-        .menu-btn small { display: block; font-size: 12px; font-weight: normal; margin-top: 5px; color: #ccc; }
-
-        /* Графічний інтерфейс */
-        #ui-layer { display: none; }
-        #top-bar { position: absolute; top: 15px; left: 15px; display: flex; gap: 15px; z-index: 100; }
-        .stat { background: rgba(0,0,0,0.8); padding: 10px 20px; border-radius: 25px; border: 1px solid #f1c40f; font-weight: bold; }
-        .gold { color: #f1c40f; } .blue { color: #3498db; }
-
-        /* ВІКНО ТЕКСТУ: Знизу зображення */
-        #modal {
-            display: none; position: fixed; bottom: 120px; left: 50%; transform: translateX(-50%);
-            background: rgba(15,15,15,0.9); padding: 20px; border-radius: 20px; z-index: 50; 
-            text-align: center; border: 2px solid #f1c40f; width: 280px; box-shadow: 0 0 20px rgba(241, 196, 15, 0.2);
+        :root {
+            --safe-top: env(safe-area-inset-top, 0px);
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+            --gold: #f1c40f;
         }
 
+        body { 
+            margin: 0; overflow: hidden; background: #000; 
+            font-family: -apple-system, system-ui, sans-serif; 
+            color: white; -webkit-user-select: none;
+        }
+
+        /* Екран меню */
+        #menu { 
+            position: fixed; inset: 0; background: #000; z-index: 3000; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px;
+        }
+        .menu-btn { 
+            width: 100%; max-width: 300px; padding: 20px; margin: 10px; 
+            border-radius: 20px; border: 2px solid var(--gold); 
+            background: #111; color: white; font-size: 18px; font-weight: bold;
+        }
+
+        /* Інтерфейс гри */
+        #ui-layer { display: none; }
+        
+        #top-bar { 
+            position: absolute; top: calc(10px + var(--safe-top)); 
+            left: 15px; right: 15px; display: flex; justify-content: space-between; z-index: 100; 
+        }
+        .stat-group { display: flex; gap: 8px; }
+        .stat { background: rgba(20,20,20,0.8); padding: 8px 15px; border-radius: 15px; border: 1px solid var(--gold); font-size: 14px; font-weight: bold; }
+
+        /* Кнопка скидання */
+        .reset-btn { background: rgba(231, 76, 60, 0.2); border: 1px solid #e74c3c; color: #e74c3c; padding: 8px 12px; border-radius: 12px; font-size: 12px; font-weight: bold; }
+
+        /* Вікно з результатом (Знизу) */
+        #modal {
+            display: none; position: fixed; bottom: calc(110px + var(--safe-bottom)); 
+            left: 50%; transform: translateX(-50%);
+            background: rgba(15,15,15,0.95); padding: 20px; border-radius: 25px; 
+            z-index: 50; text-align: center; border: 1px solid var(--gold); 
+            width: 85%; max-width: 340px;
+        }
+
+        /* Альбом */
         #album-window {
             display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: #111; padding: 25px; border-radius: 20px; z-index: 1500; text-align: center;
-            border: 2px solid #9b59b6; width: 340px; height: 500px; flex-direction: column;
+            background: #111; padding: 20px; border-radius: 25px; z-index: 1500;
+            border: 2px solid #9b59b6; width: 85%; height: 60vh; flex-direction: column;
         }
-        #album-list { flex: 1; overflow-y: auto; padding: 10px; margin-top: 10px; }
+        #album-list { flex: 1; overflow-y: auto; padding-right: 5px; }
+        .coin-row { background: #1a1a1a; margin-bottom: 8px; padding: 12px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; }
 
-        .coin-row { background: #1a1a1a; margin-bottom: 8px; padding: 12px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid #444; cursor: pointer; }
-        .rare-anim { border-left-color: #e74c3c !important; animation: blink 1s infinite; }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
-        
-        .main-nav { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); display: flex; gap: 12px; z-index: 100; }
-        button { padding: 12px 22px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        /* Нижня навігація */
+        .main-nav { 
+            position: absolute; bottom: calc(20px + var(--safe-bottom)); 
+            left: 0; right: 0; display: flex; justify-content: center; gap: 10px; padding: 0 15px; z-index: 100; 
+        }
+        .nav-btn { flex: 1; max-width: 140px; padding: 16px 5px; border-radius: 18px; border: none; font-weight: bold; font-size: 14px; }
         .btn-blue { background: #3498db; color: white; }
-        .btn-gold { background: #f1c40f; color: black; }
-        .btn-album { background: #9b59b6; color: white; }
-        button:disabled { opacity: 0.3; cursor: not-allowed; }
+        .btn-gold { background: var(--gold); color: black; }
+        .btn-purple { background: #9b59b6; color: white; }
 
-        .controls { position: absolute; top: 15px; right: 15px; display: flex; flex-direction: column; gap: 10px; z-index: 100; }
-        .btn-red { background: rgba(231, 76, 60, 0.4); color: white; border: 1px solid #e74c3c; font-size: 10px; padding: 5px 10px; }
+        button:active { transform: scale(0.95); opacity: 0.8; }
+        button:disabled { opacity: 0.3; }
     </style>
 </head>
 <body>
 
 <div id="menu">
-    <h1 style="color:#f1c40f; margin-bottom: 5px;">НУМІЗМАТ</h1>
-    <p style="margin-bottom: 20px; color: #888;">Збирайте рідкісні штемпельні браки</p>
-    <button class="menu-btn" onclick="startGame('easy')">Простий <small>Пошук: 10₴ | Багато браку</small></button>
-    <button class="menu-btn" onclick="startGame('medium')">Середній <small>Пошук: 40₴ | Реальні шанси</small></button>
-    <button class="menu-btn" onclick="startGame('realism')">Реалізм <small>Пошук: 80₴ | Рідкісний брак</small></button>
+    <h1 style="color:var(--gold); margin-bottom: 30px;">НУМІЗМАТ</h1>
+    <button class="menu-btn" onclick="startGame('easy')">Простий</button>
+    <button class="menu-btn" onclick="startGame('medium')">Середній</button>
+    <button class="menu-btn" onclick="startGame('realism')">Реалізм</button>
 </div>
 
 <div id="ui-layer">
-    <div class="controls">
-        <button onclick="location.reload()" style="background:none; border:1px solid #555; color:white; font-size:10px;">Меню</button>
-        <button class="btn-red" onclick="resetThisMode()">Скинути</button>
-    </div>
-
     <div id="top-bar">
-        <div class="stat">₴ <span id="money-val" class="gold">0</span></div>
-        <div class="stat">XP <span id="xp-val" class="blue">0</span></div>
+        <div class="stat-group">
+            <div class="stat">₴ <span id="money-val" style="color:var(--gold)">0</span></div>
+            <div class="stat">XP <span id="xp-val" style="color:#3498db">0</span></div>
+        </div>
+        <button class="reset-btn" onclick="resetThisMode()">Reset</button>
     </div>
 
     <div id="modal">
-        <h3 id="m-title" style="margin:0 0 10px 0; color:#f1c40f;"></h3>
-        <div id="coin-desc" style="margin-bottom: 15px; font-size:15px; line-height: 1.4;"></div>
-        <div style="display:flex; gap:10px; justify-content:center">
-            <button class="btn-blue" onclick="keepFound()">В альбом</button>
-            <button style="background:#444; color:white;" onclick="sellFound()">Продати</button>
+        <h3 id="m-title" style="margin-top:0; color:var(--gold)"></h3>
+        <div id="coin-desc" style="margin-bottom: 15px; font-size:15px;"></div>
+        <div style="display:flex; gap:10px;">
+            <button class="nav-btn btn-blue" style="width:50%" onclick="keepFound()">В Альбом</button>
+            <button class="nav-btn" style="width:50%; background:#333; color:white;" onclick="sellFound()">Продати</button>
         </div>
     </div>
 
     <div id="album-window">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h3>Колекція</h3>
-            <button onclick="toggleAlbum()" style="background:none; border:none; color:red; font-size:24px; cursor:pointer;">×</button>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <h3 style="margin:0">Альбом</h3>
+            <button onclick="toggleAlbum()" style="background:none; border:none; color:#ff4757; font-size:30px; padding:0 10px;">&times;</button>
         </div>
         <div id="album-list"></div>
     </div>
 
     <div class="main-nav">
-        <button id="work-btn" class="btn-blue" onclick="work()">Робота</button>
-        <button class="btn-gold" id="search-btn" onclick="search()">Шукати</button>
-        <button class="btn-album" onclick="toggleAlbum()">Альбом</button>
+        <button id="work-btn" class="nav-btn btn-blue" onclick="work()">Робота</button>
+        <button id="search-btn" class="nav-btn btn-gold" onclick="search()">Шукати</button>
+        <button class="nav-btn btn-purple" onclick="toggleAlbum()">Альбом</button>
     </div>
 </div>
 
@@ -103,36 +126,43 @@
         realism: { search: 80, work: 40, rareChance: 0.05, garbageMin: 1, startMoney: 1000 }
     };
 
+    // ФУНКЦІЯ ОЧИСТКИ (Виправлена)
+    function resetThisMode() {
+        if (!currentModeId) return;
+        if(confirm(`Скинути прогрес режиму "${currentModeId}"?`)) { 
+            localStorage.removeItem('numizmat_' + currentModeId); 
+            location.reload(); // Перезавантаження для очищення стану
+        }
+    }
+
     function saveProgress() {
         if (!currentModeId) return;
-        localStorage.setItem('numizmat_' + currentModeId, JSON.stringify({ m: money, x: xp, a: myCoins }));
+        const data = { m: money, x: xp, a: myCoins };
+        localStorage.setItem('numizmat_' + currentModeId, JSON.stringify(data));
     }
 
     function startGame(mode) {
-        currentModeId = mode; config = modes[mode];
+        currentModeId = mode; 
+        config = modes[mode];
         const saved = localStorage.getItem('numizmat_' + mode);
+        
         if (saved) {
             const data = JSON.parse(saved);
-            money = data.m; xp = data.x; myCoins = data.a;
+            money = data.m; xp = data.x; myCoins = data.a || [];
         } else {
             money = config.startMoney; xp = 0; myCoins = [];
         }
+        
         document.getElementById('menu').style.display = 'none';
         document.getElementById('ui-layer').style.display = 'block';
         updateUI();
     }
 
-    function resetThisMode() {
-        if(confirm(`Видалити прогрес цього режиму?`)) { 
-            localStorage.removeItem('numizmat_' + currentModeId); 
-            location.reload(); 
-        }
-    }
-
-    // --- 3D SCENE ---
+    // --- 3D ЧАСТИНА ---
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(40, window.innerWidth/window.innerHeight, 0.1, 1000);
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
     
@@ -140,21 +170,16 @@
     scene.add(new THREE.AmbientLight(0xffffff, 0.4));
 
     function createFace(text, label, isGold, isAvers, isIncuse) {
-        const canvas = document.createElement('canvas');
-        canvas.width = 512; canvas.height = 512;
+        const canvas = document.createElement('canvas'); canvas.width = 512; canvas.height = 512;
         const ctx = canvas.getContext('2d');
-        const color = isGold ? '#ffd700' : '#dcdcdc';
-        ctx.fillStyle = color;
+        ctx.fillStyle = isGold ? '#ffd700' : '#dcdcdc';
         ctx.beginPath(); ctx.arc(256, 256, 250, 0, Math.PI*2); ctx.fill();
         ctx.strokeStyle = '#856a00'; ctx.lineWidth = 15; ctx.stroke();
         ctx.save(); ctx.translate(256, 256);
-        if (isAvers) ctx.scale(-1, -1); else ctx.scale(1, 1);
+        if (isAvers) ctx.scale(-1, -1);
         ctx.fillStyle = 'rgba(0,0,0,0.8)'; ctx.textAlign = 'center';
-        
         if (isIncuse) {
-            ctx.scale(-1, 1);
-            ctx.font = 'bold 120px Arial'; ctx.fillText("UA", 0, 40);
-            ctx.font = 'bold 40px Arial'; ctx.fillText("(ІНКУЗ)", 0, 100);
+            ctx.scale(-1, 1); ctx.font = 'bold 120px Arial'; ctx.fillText("UA", 0, 40);
         } else {
             ctx.font = 'bold 160px Arial'; ctx.fillText(text, 0, 30);
             ctx.font = 'bold 60px Arial'; ctx.fillText(label, 0, 110);
@@ -164,103 +189,77 @@
         return tex;
     }
 
-    const coinGeo = new THREE.CylinderGeometry(2, 2, 0.12, 64);
+    const coinGeo = new THREE.CylinderGeometry(2, 2, 0.15, 64);
     const coinMesh = new THREE.Mesh(coinGeo, [
         new THREE.MeshStandardMaterial({color: 0x856a00}),
         new THREE.MeshStandardMaterial(), new THREE.MeshStandardMaterial()
     ]);
     coinMesh.rotation.z = Math.PI / 2;
     const pivot = new THREE.Group(); pivot.add(coinMesh); scene.add(pivot);
-    camera.position.set(0, 0, 10); // Строго по центру
+    camera.position.set(0, 0, 10);
 
-    function update3D(n, y, isIncuse, rotationAngle) {
-        const isGold = n >= 10;
-        
-        // Реверс (Номінал)
-        const revTex = createFace(n, "коп.", isGold, false, isIncuse);
-        if (rotationAngle !== 0) revTex.rotation = (rotationAngle * Math.PI) / 180;
-        coinMesh.material[1].map = revTex;
-        coinMesh.material[1].needsUpdate = true;
-
-        // Аверс (Герб)
-        coinMesh.material[2].map = createFace("UA", y.toString(), isGold, true, false);
+    function update3D(n, y, isInc, rot) {
+        const isG = n >= 10;
+        const rev = createFace(n, "коп.", isG, false, isInc);
+        if (rot) rev.rotation = (rot * Math.PI) / 180;
+        coinMesh.material[1].map = rev; coinMesh.material[1].needsUpdate = true;
+        coinMesh.material[2].map = createFace("UA", y.toString(), isG, true, false);
         coinMesh.material[2].needsUpdate = true;
-
-        let s = 0.55 + (n/50)*0.2; pivot.scale.set(s,s,s);
+        let s = (window.innerWidth < 600 ? 0.5 : 0.7) + (n/100); pivot.scale.set(s,s,s);
     }
 
-    // --- ЛОГІКА ГРИ ---
+    // --- ЛОГІКА ---
     function search() {
         if (money < config.search) return;
         money -= config.search;
         const n = [1, 2, 5, 10, 25, 50][Math.floor(Math.random()*6)];
-        const y = 1992 + Math.floor(Math.random()*32);
+        const y = 1992 + Math.floor(Math.random()*30);
         const roll = Math.random();
-        
-        let price, errName, isRare = false, rot = 0, isInc = false;
+        let price, err = "Звичайна", isR = false, rot = 0, isI = false;
 
-        if (roll > config.rareChance) {
-            errName = "Звичайна монета"; 
-            price = config.garbageMin + Math.floor(Math.random() * 5);
-        } else {
-            isRare = true;
-            if (roll < 0.02) { 
-                errName = "РАРИТЕТ: Інкузне карбування"; 
-                price = 3500 + Math.floor(Math.random() * 1000);
-                isInc = true;
-            } else { 
-                const angles = [45, 90, 180, 270];
-                rot = angles[Math.floor(Math.random() * angles.length)];
-                errName = `БРАК: Поворот ${rot}°`; 
-                price = 150 + (rot === 180 ? 300 : 100); 
-            }
-        }
-        
-        currentCoin = { id: Date.now(), n, y, e: errName, price, rare: isRare, rot: rot, incuse: isInc };
-        update3D(n, y, isInc, rot);
-        
-        document.getElementById('m-title').innerText = isRare ? "ЗНАЙДЕНО БРАК!" : "Монета";
-        document.getElementById('coin-desc').innerHTML = `<b>${n} коп. ${y}</b><br><span style="color:#f1c40f">${errName}</span><br>Оцінка: ${price} ₴`;
+        if (roll < config.rareChance) {
+            isR = true;
+            if (roll < 0.02) { err = "Інкуз (Раритет)"; price = 3000; isI = true; }
+            else { rot = [90, 180, 270][Math.floor(Math.random()*3)]; err = `Поворот ${rot}°`; price = 200; }
+        } else { price = config.garbageMin + Math.floor(Math.random()*5); }
+
+        currentCoin = { n, y, e: err, price, rare: isR, rot, inc: isI };
+        update3D(n, y, isI, rot);
+        document.getElementById('m-title').innerText = isR ? "БРАК!" : "Монета";
+        document.getElementById('coin-desc').innerHTML = `<b>${n} коп. ${y}</b><br>${err}<br>Ціна: ${price} ₴`;
         document.getElementById('modal').style.display = 'block';
         updateUI(); saveProgress();
     }
 
     function work() { if(xp >= 8) { xp -= 8; money += config.work; updateUI(); saveProgress(); } }
-    function keepFound() { myCoins.push(currentCoin); xp += (currentCoin.rare ? 50 : 5); closeModal(); saveProgress(); }
+    function keepFound() { myCoins.push(currentCoin); xp += (currentCoin.rare?50:5); closeModal(); saveProgress(); }
     function sellFound() { money += currentCoin.price; closeModal(); saveProgress(); }
     function closeModal() { document.getElementById('modal').style.display = 'none'; updateUI(); }
-
     function toggleAlbum() {
         const w = document.getElementById('album-window');
         w.style.display = (w.style.display==='flex')?'none':'flex';
         if(w.style.display==='flex') renderAlbum();
     }
-
     function renderAlbum() {
         const list = document.getElementById('album-list'); list.innerHTML = '';
         myCoins.forEach((c, i) => {
             const row = document.createElement('div');
-            row.className = `coin-row ${c.rare?'rare-anim':''}`;
-            row.onclick = () => update3D(c.n, c.y, c.incuse, c.rot);
-            row.innerHTML = `<div><b>${c.n}к ${c.y}</b><br><small>${c.e}</small></div><button style="background:#e74c3c; color:white; border:none; padding:5px 8px; border-radius:5px;" onclick="event.stopPropagation(); sellFromAlbum(${i})">${c.price}₴</button>`;
+            row.className = 'coin-row';
+            row.style.borderLeft = c.rare ? '4px solid #e74c3c' : '4px solid #444';
+            row.onclick = () => update3D(c.n, c.y, c.inc, c.rot);
+            row.innerHTML = `<div><b>${c.n}к ${c.y}</b><br><small>${c.e}</small></div><button style="background:#e74c3c; color:white; border:none; padding:8px; border-radius:10px;" onclick="event.stopPropagation(); sellFromAlbum(${i})">${c.price}₴</button>`;
             list.appendChild(row);
         });
     }
-
     function sellFromAlbum(i) { money += myCoins[i].price; myCoins.splice(i, 1); updateUI(); renderAlbum(); saveProgress(); }
-    
     function updateUI() {
         document.getElementById('money-val').innerText = money;
         document.getElementById('xp-val').innerText = xp;
         document.getElementById('work-btn').disabled = xp < 8;
         document.getElementById('search-btn').disabled = money < config.search;
-        document.getElementById('work-btn').innerText = `Робота (+${config.work}₴)`;
-        document.getElementById('search-btn').innerText = `Шукати (-${config.search}₴)`;
     }
-
     function animate() { requestAnimationFrame(animate); pivot.rotation.y += 0.02; renderer.render(scene, camera); }
     animate();
-
     window.addEventListener('resize', () => {
         camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
