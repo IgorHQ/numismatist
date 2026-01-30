@@ -36,7 +36,8 @@
 
         #modal {
             display: none; position: absolute; 
-            bottom: calc(90px + var(--ios-bottom)); 
+            /* ОПУЩЕНО ВІКНО */
+            bottom: calc(75px + var(--ios-bottom)); 
             left: 50%; transform: translateX(-50%);
             background: rgba(20,20,20,0.96); padding: 12px 15px; border-radius: 18px; 
             text-align: center; border: 1px solid var(--gold); 
@@ -130,7 +131,11 @@
     const coinMesh = new THREE.Mesh(new THREE.CylinderGeometry(2, 2, 0.18, 64), [new THREE.MeshStandardMaterial({color: 0xaa8800}), new THREE.MeshStandardMaterial(), new THREE.MeshStandardMaterial()]);
     coinMesh.rotation.z = Math.PI/2;
     const pivot = new THREE.Group(); pivot.add(coinMesh); scene.add(pivot);
-    pivot.position.y = 1.2; // Монета ще вище
+    
+    /* МОНЕТА ОПУЩЕНА ТА ЗМЕНШЕНА */
+    pivot.position.y = 0.5; 
+    pivot.scale.set(0.9, 0.9, 0.9);
+    
     camera.position.set(0, 0, 11);
 
     function createFace(text, label, isGold, isAvers, isIncuse, rot = 0) {
@@ -182,7 +187,6 @@
         update3D(n, y, isI, rot);
         
         document.getElementById('m-title').innerText = isR ? "⭐ РАРИТЕТ ⭐" : "Знайдено";
-        // ПОВЕРНУТО ПОВНИЙ ОПИС ТУТ:
         document.getElementById('coin-desc').innerHTML = `
             <b>${n} коп. ${y} року</b><br>
             <span style="color:${isR ? 'var(--gold)' : '#3498db'}; font-weight:bold;">${err}</span><br>
