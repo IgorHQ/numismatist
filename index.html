@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Нумізмат Pro Final</title>
+    <title>Нумізмат Pro Fix</title>
     <style>
         :root {
             --gold: #f1c40f;
@@ -17,7 +17,6 @@
             -webkit-user-select: none;
         }
 
-        /* Піднімаємо монету вище в її зоні */
         #container3d {
             position: absolute; top: 0; left: 0; width: 100%;
             height: 60svh; z-index: 1;
@@ -35,15 +34,14 @@
         .top-btns { display: flex; gap: 5px; }
         .reset-btn { background: rgba(231,76,60,0.2); border: 1px solid #e74c3c; color: #e74c3c; padding: 6px 10px; border-radius: 10px; font-size: 11px; font-weight: bold; }
 
-        /* ВІКНО ОПУЩЕНО максимально низько до кнопок */
         #modal {
             display: none; position: absolute; 
             bottom: calc(90px + var(--ios-bottom)); 
             left: 50%; transform: translateX(-50%);
-            background: rgba(20,20,20,0.96); padding: 10px 15px; border-radius: 18px; 
+            background: rgba(20,20,20,0.96); padding: 12px 15px; border-radius: 18px; 
             text-align: center; border: 1px solid var(--gold); 
-            width: 75%; max-width: 240px; pointer-events: auto;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.6);
+            width: 78%; max-width: 250px; pointer-events: auto;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.7);
         }
 
         .main-nav { 
@@ -92,8 +90,8 @@
     </div>
 
     <div id="modal">
-        <h3 id="m-title" style="margin:0; color:var(--gold); font-size: 15px;"></h3>
-        <div id="coin-desc" style="margin: 5px 0; font-size:13px; line-height: 1.3;"></div>
+        <h3 id="m-title" style="margin:0; color:var(--gold); font-size: 15px; text-transform: uppercase;"></h3>
+        <div id="coin-desc" style="margin: 8px 0; font-size:14px; line-height: 1.4;"></div>
         <div style="display:flex; gap:8px; margin-top:5px;">
             <button class="nav-btn btn-blue" style="padding:10px 0; font-size:11px;" onclick="keepFound()">В Альбом</button>
             <button class="nav-btn" style="padding:10px 0; font-size:11px; background:#444; color:white;" onclick="sellFound()">Продати</button>
@@ -132,8 +130,7 @@
     const coinMesh = new THREE.Mesh(new THREE.CylinderGeometry(2, 2, 0.18, 64), [new THREE.MeshStandardMaterial({color: 0xaa8800}), new THREE.MeshStandardMaterial(), new THREE.MeshStandardMaterial()]);
     coinMesh.rotation.z = Math.PI/2;
     const pivot = new THREE.Group(); pivot.add(coinMesh); scene.add(pivot);
-    // Зміщуємо камеру або півот трохи вгору, щоб звільнити місце внизу
-    pivot.position.y = 1; 
+    pivot.position.y = 1.2; // Монета ще вище
     camera.position.set(0, 0, 11);
 
     function createFace(text, label, isGold, isAvers, isIncuse, rot = 0) {
@@ -155,7 +152,6 @@
         coinMesh.material[1].map = createFace(n, "коп.", isG, false, isInc, rot);
         coinMesh.material[2].map = createFace("UA", y.toString(), isG, true, false, 0);
         coinMesh.material[1].needsUpdate = true; coinMesh.material[2].needsUpdate = true;
-        pivot.scale.set(1.15, 1.15, 1.15);
     }
 
     update3D(5, 2024, false, 0);
@@ -175,14 +171,23 @@
         money -= config.search;
         const n = [1, 2, 5, 10, 25, 50][Math.floor(Math.random()*6)], y = 1992 + Math.floor(Math.random()*30);
         const roll = Math.random(); let price, err = "Звичайна", isR = false, rot = 0, isI = false;
+        
         if (roll < config.rareChance) {
-            isR = true; if (roll < 0.02) { err = "Інкузний брак"; price = 3000; isI = true; }
+            isR = true; 
+            if (roll < 0.02) { err = "Інкузний брак"; price = 3000; isI = true; }
             else { rot = [90, 180, 270][Math.floor(Math.random()*3)]; err = `Поворот ${rot}°`; price = 250; }
         } else price = config.garbageMin + Math.floor(Math.random()*5);
+        
         currentCoin = { n, y, e: err, price, rare: isR, rot, inc: isI };
         update3D(n, y, isI, rot);
-        document.getElementById('m-title').innerText = isR ? "⭐ РАРИТЕТ ⭐" : "Знайдено монету";
-        document.getElementById('coin-desc').innerHTML = `<b>${n} коп. ${y}</b><br><span style="color:#2ecc71; font-weight:bold;">${price} ₴</span>`;
+        
+        document.getElementById('m-title').innerText = isR ? "⭐ РАРИТЕТ ⭐" : "Знайдено";
+        // ПОВЕРНУТО ПОВНИЙ ОПИС ТУТ:
+        document.getElementById('coin-desc').innerHTML = `
+            <b>${n} коп. ${y} року</b><br>
+            <span style="color:${isR ? 'var(--gold)' : '#3498db'}; font-weight:bold;">${err}</span><br>
+            <span style="color:#2ecc71; font-weight:bold; font-size:15px;">${price} ₴</span>
+        `;
         document.getElementById('modal').style.display = 'block';
         updateUI(); saveProgress();
     }
@@ -192,13 +197,13 @@
     function sellFound() { money += currentCoin.price; closeModal(); }
     function closeModal() { document.getElementById('modal').style.display = 'none'; updateUI(); saveProgress(); }
     function saveProgress() { localStorage.setItem('numizmat_' + currentModeId, JSON.stringify({ m: money, x: xp, a: myCoins })); }
-    function resetThisMode() { if(confirm("Очистити прогрес?")) { localStorage.removeItem('numizmat_' + currentModeId); location.reload(); } }
+    function resetThisMode() { if(confirm("Скинути прогрес?")) { localStorage.removeItem('numizmat_' + currentModeId); location.reload(); } }
     function toggleAlbum() { const w = document.getElementById('album-window'); w.style.display = (w.style.display==='flex')?'none':'flex'; if(w.style.display==='flex') renderAlbum(); }
     function renderAlbum() {
         const list = document.getElementById('album-list'); list.innerHTML = '';
         myCoins.forEach((c, i) => {
             const row = document.createElement('div'); row.className = 'coin-row';
-            row.innerHTML = `<div><b>${c.n}к ${c.y}</b><br><small>${c.e}</small></div><button style="background:#e74c3c; color:white; border:none; padding:8px 12px; border-radius:8px;" onclick="sellFromAlbum(${i}, event)">${c.price}₴</button>`;
+            row.innerHTML = `<div><b>${c.n}к ${c.y}</b><br><small style="color:${c.rare?'var(--gold)':'#888'}">${c.e}</small></div><button style="background:#e74c3c; color:white; border:none; padding:8px 12px; border-radius:10px; font-weight:bold;" onclick="sellFromAlbum(${i}, event)">${c.price}₴</button>`;
             row.onclick = () => { update3D(c.n, c.y, c.inc, c.rot); toggleAlbum(); };
             list.appendChild(row);
         });
